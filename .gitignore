@@ -7,9 +7,15 @@ venv/
 .envd
 backend/ai/models/
 
-# Node
+# Node / frontend build artifacts (never commit — Railway runs npm install)
 node_modules/
+**/node_modules/
 dist/
+**/dist/
+.vite/
+**/.vite/
+*.tsbuildinfo
+.cache/
 
 # IDE / OS
 .DS_Store
