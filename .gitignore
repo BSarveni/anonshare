@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 venv/
 .env
+.envd
 backend/ai/models/
 
 # Node
