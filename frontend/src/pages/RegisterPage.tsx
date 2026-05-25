@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Modal from '../components/Modal'
 import { useAuth } from '../context/AuthContext'
 import { authApi } from '../lib/api'
+import { formatApiError } from '../lib/apiError'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -18,10 +19,18 @@ export default function RegisterPage() {
     setLoading(true)
     try {
       const { data } = await authApi.register(password)
-      await login(data.access_token)
+      try {
+        await login(data.access_token)
+      } catch {
+        setPseudonym(data.pseudonym)
+        setError(
+          `Account created as ${data.pseudonym}, but auto sign-in failed. Save your pseudonym and use Log in.`,
+        )
+        return
+      }
       setPseudonym(data.pseudonym)
-    } catch {
-      setError('Registration failed. Use at least 8 characters.')
+    } catch (err) {
+      setError(formatApiError(err, 'Registration failed.'))
     } finally {
       setLoading(false)
     }

@@ -7,7 +7,7 @@ alembic
 redis
 celery
 python-jose[cryptography]
-passlib[bcrypt]
+bcrypt>=4.0,<5
 cloudinary
 detoxify
 scikit-learn

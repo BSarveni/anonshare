@@ -1,7 +1,15 @@
 import axios from 'axios'
 
+const apiBaseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') ?? ''
+
+if (!apiBaseUrl && import.meta.env.PROD) {
+  console.error(
+    'VITE_API_URL is missing. Set it in Railway frontend variables and redeploy.',
+  )
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: apiBaseUrl || undefined,
   headers: { 'Content-Type': 'application/json' },
 })
 
