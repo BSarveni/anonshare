@@ -8,17 +8,17 @@ Anonymous image sharing with group chat, AI content moderation, and anomaly dete
 
 2. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**.
 
-3. Railway auto-detects the repo. Create these services manually:
+3. Railway auto-detects the repo. Create these services manually (5 total — Railway’s per-project limit):
 
    - **PostgreSQL** plugin (click Add Plugin)
    - **Redis** plugin (click Add Plugin)
-   - Service from `/backend` (set root dir to `/backend`, Dockerfile)
-   - Service from `/backend` with `Dockerfile.celery` (rename to `celery-worker`)
-   - Service from `/backend` with `Dockerfile.beat` (rename to `celery-beat`)
-   - Service from `/frontend` (set root dir to `/frontend`)
+   - Service from `/backend` (set root dir to `/backend`, `Dockerfile`)
+   - Service from `/backend` with `Dockerfile.celery-combined` (rename to `celery` — worker + beat in one container)
+   - Service from `/frontend` (set root dir to `/frontend`, `Dockerfile`)
 
-4. For each backend service, go to **Variables** → add all vars from `backend/.env.example`.  
-   Railway auto-injects `DATABASE_URL` and `REDIS_URL` from the plugins.
+   Do **not** add separate `Dockerfile.celery` and `Dockerfile.beat` services unless your plan allows more than 5 services. For local dev you can still run worker and beat in separate terminals (see below).
+
+4. For **api** and **celery**, go to **Variables** → add all vars from `backend/.env.example`, and reference `DATABASE_URL` / `REDIS_URL` from the plugins.
 
 5. For the **frontend** service, add:
 
