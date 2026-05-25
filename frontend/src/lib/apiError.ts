@@ -1,14 +1,23 @@
 import axios from 'axios'
 
+import { apiBaseUrl, apiRegisterUrl } from './api'
+
 export function formatApiError(err: unknown, fallback: string): string {
   if (!axios.isAxiosError(err)) {
     return fallback
   }
   if (!err.response) {
+    const target = apiRegisterUrl()
+    if (!apiBaseUrl) {
+      return (
+        'VITE_API_URL is empty in this build. Set it in Railway frontend variables, then Redeploy ' +
+        'the frontend service (variables are baked in at build time).'
+      )
+    }
     return (
-      'Cannot reach the API (network/CORS). Check: (1) VITE_API_URL is your Railway API URL, ' +
-      '(2) frontend was redeployed after setting it, (3) API /health works in the browser, ' +
-      '(4) ALLOWED_ORIGINS on the API includes your frontend URL.'
+      `Cannot reach the API at ${target}. Usually CORS or a wrong API URL. ` +
+      'Open that /health URL in your browser. On the api service set ALLOWED_ORIGINS to your ' +
+      `frontend URL (e.g. ${window.location.origin}), redeploy api, then redeploy frontend.`
     )
   }
   if (err.response.status === 502 || err.response.status === 503) {

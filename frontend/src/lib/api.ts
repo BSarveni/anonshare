@@ -1,11 +1,15 @@
 import axios from 'axios'
 
-const apiBaseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') ?? ''
+export const apiBaseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') ?? ''
 
 if (!apiBaseUrl && import.meta.env.PROD) {
   console.error(
     'VITE_API_URL is missing. Set it in Railway frontend variables and redeploy.',
   )
+}
+
+export function apiRegisterUrl(): string {
+  return apiBaseUrl ? `${apiBaseUrl}/api/auth/register` : '(VITE_API_URL not set — redeploy frontend)'
 }
 
 const api = axios.create({

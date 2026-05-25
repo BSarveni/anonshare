@@ -68,11 +68,21 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AnonShare API", version="1.0.0", lifespan=lifespan)
 
-origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173")
+origins = [o.strip().rstrip("/") for o in _raw_origins.split(",") if o.strip()]
+
+# Allow any Railway frontend domain (common deploy mismatch with ALLOWED_ORIGINS).
+railway_origin_regex = os.getenv(
+    "CORS_RAILWAY_REGEX",
+    r"https://.*\.up\.railway\.app",
+)
+
+logger.info("CORS allow_origins=%s allow_origin_regex=%s", origins, railway_origin_regex)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=railway_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
