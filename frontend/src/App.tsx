@@ -21,16 +21,24 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+function RouteLoading() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-100 text-slate-600">
+      Loading…
+    </div>
+  )
+}
+
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { isAdmin, loading } = useAuth()
-  if (loading) return null
+  if (loading) return <RouteLoading />
   if (!isAdmin) return <Navigate to="/feed" replace />
   return <>{children}</>
 }
 
 function PublicOnly({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth()
-  if (loading) return null
+  if (loading) return <RouteLoading />
   if (isAuthenticated) return <Navigate to="/feed" replace />
   return <>{children}</>
 }

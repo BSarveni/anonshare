@@ -10,7 +10,11 @@ export type WsMessage = {
 }
 
 export function groupWebSocketUrl(groupId: string, token: string): string {
-  const base = import.meta.env.VITE_WS_URL.replace(/\/$/, '')
+  const wsUrl = import.meta.env.VITE_WS_URL
+  if (!wsUrl) {
+    throw new Error('VITE_WS_URL is not set — rebuild the frontend with Railway env vars.')
+  }
+  const base = wsUrl.replace(/\/$/, '')
   return `${base}/ws/${groupId}?token=${encodeURIComponent(token)}`
 }
 
