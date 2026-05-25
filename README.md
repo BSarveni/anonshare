@@ -27,6 +27,8 @@ Anonymous image sharing with group chat, AI content moderation, and anomaly dete
 
 6. Deploy. Visit the frontend service URL.
 
+**Networking ports:** The API listens on Railway's `PORT` variable (often not 8000). In **api** → **Settings** → **Networking**, set the public domain target port to the value of `PORT` in that service's variables (or redeploy after the latest `Dockerfile`, which uses `${PORT:-8000}`). Frontend target port is **3000**.
+
 The API container runs `prestart.sh` before Uvicorn (`alembic upgrade head`, then `python init_db.py`). Railway's `postgresql://` URLs are rewritten to `postgresql+asyncpg://` automatically in `database.py`.
 
 ## Local dev

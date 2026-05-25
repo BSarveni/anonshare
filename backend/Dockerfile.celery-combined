@@ -11,4 +11,5 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 
 # Worker + beat in one container (fits Railway's 5-service limit).
-CMD ["celery", "-A", "tasks.celery_app", "worker", "--beat", "--loglevel=info"]
+# solo + concurrency=1: avoids 48 prefork workers OOMing on small Railway instances.
+CMD ["celery", "-A", "tasks.celery_app", "worker", "--beat", "--loglevel=info", "--pool=solo", "--concurrency=1"]

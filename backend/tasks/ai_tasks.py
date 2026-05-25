@@ -14,7 +14,17 @@ from tasks.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
-moderator = ContentModerator()
+
+_moderator: ContentModerator | None = None
+
+
+def _get_moderator() -> ContentModerator:
+    """Load Detoxify only when a task runs (not at worker import with prefork)."""
+    global _moderator
+    if _moderator is None:
+        _moderator = ContentModerator()
+    return _moderator
+
 
 engine = create_async_engine(settings.database_url)
 SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -109,7 +119,7 @@ async def _process_post_moderation(post_id: str) -> dict:
             return {"status": "skipped", "reason": "user not found"}
 
         if post.caption is not None:
-            content_result = moderator.moderate(post.caption)
+            content_result = _get_moderator().moderate(post.caption)
             if not content_result.allowed:
                 await _create_content_flag(
                     db,
@@ -150,7 +160,7 @@ async def _process_message_moderation(message_id: str, user_id: str) -> dict:
         if not user:
             return {"status": "skipped", "reason": "user not found"}
 
-        content_result = moderator.moderate(message.content)
+        content_result = _get_moderator().moderate(message.content)
         if not content_result.allowed:
             await _create_content_flag(
                 db,
