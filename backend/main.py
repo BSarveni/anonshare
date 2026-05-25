@@ -56,7 +56,12 @@ async def init_database(max_retries: int = 15, delay_seconds: float = 2.0) -> No
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     configure_cloudinary()
-    await init_database()
+    app.state.db_ready = False
+    try:
+        await init_database()
+        app.state.db_ready = True
+    except Exception as exc:
+        logger.error("Database init failed (API will start; /health shows status): %s", exc)
     yield
     await engine.dispose()
 
@@ -82,4 +87,8 @@ async def group_chat_websocket(websocket: WebSocket, group_id: uuid.UUID):
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    db_ready = getattr(app.state, "db_ready", False)
+    return {
+        "status": "ok" if db_ready else "degraded",
+        "db": db_ready,
+    }
